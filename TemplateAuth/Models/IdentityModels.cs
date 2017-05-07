@@ -6,7 +6,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using Microsoft.AspNet.Identity.Owin;
 using System;
-using TemplateAuth.EntityModels;
 
 namespace TemplateAuth.Models
 {
@@ -50,7 +49,7 @@ namespace TemplateAuth.Models
     }
 
 
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string, ApplicationUserLogin, ApplicationUserRole, ApplicationUserClaim>
+    public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string, ApplicationUserLogin, ApplicationUserRole, ApplicationUserClaim>
     {
         public ApplicationDbContext()
             : base("DefaultConnection")
@@ -68,7 +67,7 @@ namespace TemplateAuth.Models
             return new ApplicationDbContext();
         }
 
-        public DbSet<UserInfo> userInfoSet { get; set; }
+        //public DbSet<UserInfo> UserInfoes { get; set; }
     }
 
     public class ApplicationUserStore : UserStore<ApplicationUser, ApplicationRole, string, ApplicationUserLogin, ApplicationUserRole,

@@ -74,16 +74,14 @@ namespace TemplateAuth.Controllers
         {
             ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
 
-            if (user.Email.Equals(email))
+            if (user.Email.Equals(email) || (User.IsInRole("Admin")))
             {
-
+                var result = Request.GetOwinContext().Get<ApplicationDbContext>();
+                //var list = result.UserInfoes;
+                return Ok();
             }
             else
-            {
-                if (!User.IsInRole("Admin"))
                     return StatusCode(HttpStatusCode.Forbidden);
-
-            }
         }
 
         [HttpPost]
