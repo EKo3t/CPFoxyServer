@@ -1,0 +1,6 @@
+namespace TemplateAuth.Areas.HelpPage.ModelDescriptions
+{
+    public class SimpleTypeModelDescription : ModelDescription
+    {
+    }
+}
