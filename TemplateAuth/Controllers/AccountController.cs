@@ -133,8 +133,8 @@ namespace TemplateAuth.Controllers
                         result.LastName = userInfo.LastName;
                         result.MiddleName = userInfo.MiddleName;
                         result.BirthDate = userInfo.BirthDate;
-                        result.UserId = user.Id;
-                        result.User = user;
+                        result.UserId = userByEmail.Id;
+                        result.User = userByEmail;
                         context.UserInfoes.Add(result);
                     }
                     await context.SaveChangesAsync();

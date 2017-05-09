@@ -66,6 +66,8 @@ namespace TemplateAuth.Controllers
                     break;
                 }
             }
+            if (user == null)
+                return StatusCode(HttpStatusCode.BadRequest);
             var rolesForUser = await userManager.GetRolesAsync(user.Id);
             if (rolesForUser.Count() > 0)
             {
@@ -73,6 +75,12 @@ namespace TemplateAuth.Controllers
                 {
                     var result = await userManager.RemoveFromRolesAsync(user.Id);
                 }
+            }
+            UserInfo userInfo = context.UserInfoes.FirstOrDefault(u => u.UserId.Equals(user.Id));
+            if (userInfo != null)
+            {
+                context.UserInfoes.Remove(userInfo);
+                context.Entry(userInfo).State = EntityState.Deleted;
             }
             try
             {
