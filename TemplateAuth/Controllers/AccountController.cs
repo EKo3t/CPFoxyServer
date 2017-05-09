@@ -73,15 +73,82 @@ namespace TemplateAuth.Controllers
         public async Task<IHttpActionResult> getUserInfo(Dictionary<string, string> email)
         {
             ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-
             if (user.Email.Equals(email) || (User.IsInRole("Admin")))
             {
-                var result = Request.GetOwinContext().Get<ApplicationDbContext>();
-                //var list = result.UserInfoes;
-                return Ok();
+                ApplicationUser userByEmail = null;
+                var context = Request.GetOwinContext().Get<ApplicationDbContext>();
+                foreach (ApplicationUser loopUser in context.Users.ToList())
+                {
+                    if (loopUser.Email.Equals(email["email"]))
+                    {
+                        userByEmail = loopUser;
+                        break;
+                    }
+                }
+                if (userByEmail == null)
+                    return StatusCode(HttpStatusCode.NoContent);
+                var result = context.UserInfoes.First(u => u.UserId.Equals(userByEmail.Id));
+                UserInfoCM userInfo = new UserInfoCM(result);
+                userInfo.Email = email["email"];
+                return Ok(userInfo);
             }
             else
-                    return StatusCode(HttpStatusCode.Forbidden);
+                return StatusCode(HttpStatusCode.Forbidden);
+        }
+
+        [HttpPost]
+        [Route("ChangeInfo")]
+        [HostAuthentication(DefaultAuthenticationTypes.ExternalCookie)]
+        public async Task<IHttpActionResult> setUserInfo(UserInfoCM userInfo)
+        {
+            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user.Email.Equals(userInfo.Email) || (User.IsInRole("Admin")))
+            {
+                ApplicationUser userByEmail = null;
+                var context = Request.GetOwinContext().Get<ApplicationDbContext>();
+                foreach (ApplicationUser loopUser in context.Users.ToList())
+                {
+                    if (loopUser.Email.Equals(userInfo.Email))
+                    {
+                        userByEmail = loopUser;
+                        break;
+                    }
+                }
+                if (userByEmail == null)
+                    return StatusCode(HttpStatusCode.NoContent);
+                try
+                {
+                    var result = context.UserInfoes.FirstOrDefault(u => u.UserId.Equals(userByEmail.Id));
+                    if (result != null)
+                    {
+                        result.FirstName = userInfo.FirstName;
+                        result.LastName = userInfo.LastName;
+                        result.MiddleName = userInfo.MiddleName;
+                        result.BirthDate = userInfo.BirthDate;
+                        context.Entry(result).State = System.Data.Entity.EntityState.Modified;
+                    } else
+                    {
+                        result = context.UserInfoes.Create();
+                        result.FirstName = userInfo.FirstName;
+                        result.LastName = userInfo.LastName;
+                        result.MiddleName = userInfo.MiddleName;
+                        result.BirthDate = userInfo.BirthDate;
+                        result.UserId = user.Id;
+                        result.User = user;
+                        context.UserInfoes.Add(result);
+                    }
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.StackTrace);
+                    return StatusCode(HttpStatusCode.InternalServerError);
+                }
+                return Ok(userInfo);
+            }
+            else
+                return StatusCode(HttpStatusCode.Forbidden);
+
         }
 
         [HttpPost]

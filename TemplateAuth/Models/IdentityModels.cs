@@ -59,7 +59,7 @@ namespace TemplateAuth.Models
 
         static ApplicationDbContext()
         {
-            Database.SetInitializer<ApplicationDbContext>(new ApplicationDbInitializer());
+            Database.SetInitializer<ApplicationDbContext>(null);
         }
 
         public static ApplicationDbContext Create()
@@ -67,7 +67,7 @@ namespace TemplateAuth.Models
             return new ApplicationDbContext();
         }
 
-        //public DbSet<UserInfo> UserInfoes { get; set; }
+        public DbSet<UserInfo> UserInfoes { get; set; }
     }
 
     public class ApplicationUserStore : UserStore<ApplicationUser, ApplicationRole, string, ApplicationUserLogin, ApplicationUserRole,

@@ -1,4 +1,4 @@
-namespace TemplateAuth.Migrations
+﻿namespace TemplateAuth.Migrations
 {
     using System;
     using System.Data.Entity;

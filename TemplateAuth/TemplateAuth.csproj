@@ -227,6 +227,8 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="ClientModels\UserCreateModel.cs" />
+    <Compile Include="ClientModels\UserInfoCM.cs" />
     <Compile Include="ClientModels\UserTableModel.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
@@ -238,6 +240,10 @@
     <Compile Include="Migrations\201705051458186_InitialCreate.cs" />
     <Compile Include="Migrations\201705051458186_InitialCreate.Designer.cs">
       <DependentUpon>201705051458186_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705071646420_UserInfo.cs" />
+    <Compile Include="Migrations\201705071646420_UserInfo.Designer.cs">
+      <DependentUpon>201705071646420_UserInfo.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -329,6 +335,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201705051458186_InitialCreate.resx">
       <DependentUpon>201705051458186_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705071646420_UserInfo.resx">
+      <DependentUpon>201705071646420_UserInfo.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
