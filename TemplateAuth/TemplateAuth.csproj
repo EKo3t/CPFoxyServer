@@ -227,12 +227,14 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="ClientModels\OrderCM.cs" />
     <Compile Include="ClientModels\UserCreateModel.cs" />
     <Compile Include="ClientModels\UserInfoCM.cs" />
     <Compile Include="ClientModels\UserTableModel.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -245,9 +247,15 @@
     <Compile Include="Migrations\201705071646420_UserInfo.Designer.cs">
       <DependentUpon>201705071646420_UserInfo.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705091623319_Orders.cs" />
+    <Compile Include="Migrations\201705091623319_Orders.Designer.cs">
+      <DependentUpon>201705091623319_Orders.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\Status.cs" />
     <Compile Include="Models\UserInfo.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -338,6 +346,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705071646420_UserInfo.resx">
       <DependentUpon>201705071646420_UserInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705091623319_Orders.resx">
+      <DependentUpon>201705091623319_Orders.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

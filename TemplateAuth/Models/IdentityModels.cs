@@ -68,6 +68,8 @@ namespace TemplateAuth.Models
         }
 
         public DbSet<UserInfo> UserInfoes { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Status> Statuses { get; set; }
     }
 
     public class ApplicationUserStore : UserStore<ApplicationUser, ApplicationRole, string, ApplicationUserLogin, ApplicationUserRole,
