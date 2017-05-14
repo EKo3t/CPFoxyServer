@@ -23,7 +23,7 @@ namespace TemplateAuth.Controllers
         [System.Web.Http.HttpGet]
         [System.Web.Http.Route("Users")]
         [HostAuthentication(DefaultAuthenticationTypes.ApplicationCookie)]
-        public Task<string> getUsers()
+        public async Task<IHttpActionResult> getUsers()
         {
             List<UserTableModel> userTableModelList = new List<UserTableModel>();
             using (ApplicationDbContext context = Request.GetOwinContext().Get<ApplicationDbContext>())
@@ -33,7 +33,10 @@ namespace TemplateAuth.Controllers
                 foreach (ApplicationUser user in users)
                 {
                     UserTableModel userModel = new UserTableModel();
-                    var userInfo = context.UserInfoes.FirstOrDefault(u => u.UserId.Equals(user.Id));
+                    var userToInfo = context.UserToInfoes.FirstOrDefault(u => u.UserId.Equals(user.Id));
+                    if (userToInfo != null && userToInfo.UserInfo == null)
+                        userToInfo.UserInfo = context.UserInfoes.FirstOrDefault(u => u.Id.Equals(userToInfo.UserInfoId));
+                    var userInfo = userToInfo == null ? null : userToInfo.UserInfo;
                     userModel.Email = user.Email;
                     userModel.FirstName = userInfo == null ? "" : userInfo.FirstName;
                     userModel.LastName = userInfo == null ? "" : userInfo.LastName;
@@ -41,7 +44,7 @@ namespace TemplateAuth.Controllers
                     userTableModelList.Add(userModel);
                 }
             }
-            return JsonConvert.SerializeObjectAsync(userTableModelList);
+            return Ok(userTableModelList);
         }
 
         [System.Web.Http.HttpPost]
@@ -76,14 +79,15 @@ namespace TemplateAuth.Controllers
                     var result = await userManager.RemoveFromRolesAsync(user.Id);
                 }
             }
-            UserInfo userInfo = context.UserInfoes.FirstOrDefault(u => u.UserId.Equals(user.Id));
-            if (userInfo != null)
-            {
-                context.UserInfoes.Remove(userInfo);
-                context.Entry(userInfo).State = EntityState.Deleted;
-            }
             try
             {
+                var userToInfo = context.UserToInfoes.FirstOrDefault(u => u.UserId.Equals(user.Id));
+                UserInfo userInfo = userToInfo == null ? null : userToInfo.UserInfo;
+                if (userInfo != null)
+                {
+                    context.UserInfoes.Remove(userInfo);
+                    context.Entry(userInfo).State = EntityState.Deleted;
+                }
                 context.Users.Remove(user);
                 await context.SaveChangesAsync();
             } 
@@ -114,15 +118,17 @@ namespace TemplateAuth.Controllers
 
             if (result.Succeeded)
             {
-                UserInfo userInfo = new UserInfo();
+                UserInfo userInfo = context.UserInfoes.Create();
                 userInfo.FirstName = model.FirstName;
                 userInfo.LastName = model.LastName;
                 userInfo.MiddleName = model.MiddleName;
                 userInfo.BirthDate = model.BirthDate;
-                userInfo.User = user;
-                userInfo.UserId = user.Id;
+                var userToInfo = context.UserToInfoes.Create();
+                userToInfo.User = user;
+                userToInfo.UserInfo = userInfo;                
                 try
                 {
+                    context.UserToInfoes.Add(userToInfo);
                     context.UserInfoes.Add(userInfo);
                     await context.SaveChangesAsync();
                 }

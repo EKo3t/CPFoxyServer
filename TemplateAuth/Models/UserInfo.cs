@@ -18,10 +18,5 @@ namespace TemplateAuth.Models
         public string MiddleName { get; set; }
 
         public DateTime BirthDate { get; set; }
-
-        [ForeignKey("User")]
-        public string UserId { get; set; }
-
-        public virtual ApplicationUser User { get; set; }
     }
 }

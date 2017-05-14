@@ -19,7 +19,7 @@ namespace TemplateAuth.Controllers
         [HttpPost]        
         [Route("Create")]
         [HostAuthentication(DefaultAuthenticationTypes.ApplicationCookie)]
-        public async Task<IHttpActionResult> createOrder(OrderCM model)
+        public async Task<IHttpActionResult> CreateOrder(OrderCM model)
         {
             var userManager = Request.GetOwinContext().Get<ApplicationUserManager>();
             ApplicationUser user = await userManager.FindByIdAsync(User.Identity.GetUserId());
@@ -54,20 +54,81 @@ namespace TemplateAuth.Controllers
         [HttpGet]
         [Route("List")]
         [HostAuthentication(DefaultAuthenticationTypes.ApplicationCookie)]
-        public async Task<IHttpActionResult> GetList()
+        public async Task<IHttpActionResult> GetUserOrderList()
         {
             var userManager = Request.GetOwinContext().Get<ApplicationUserManager>();
             var context = Request.GetOwinContext().Get<ApplicationDbContext>();
             if (context == null || userManager == null)
                 return StatusCode(HttpStatusCode.InternalServerError);
             string userId = User.Identity.GetUserId();
-            List<Order> orders = new List<Order>();
+            List<OrderCM> orders = new List<OrderCM>();
             foreach (Order order in context.Orders)
             {
                 if (order.UserId != null && order.UserId.Equals(userId))
-                    orders.Add(order);
+                {
+                    OrderCM clientModel = new OrderCM(order);
+                    clientModel.Id = order.Id;
+                    clientModel.Status = order.Status;
+                    clientModel.Email = order.User.Email;
+                    orders.Add(clientModel);
+                }
             }
             return Ok(orders);
+        }
+
+        [HttpGet]
+        [Route("AllList")]
+        [HostAuthentication(DefaultAuthenticationTypes.ApplicationCookie)]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IHttpActionResult> GetOrderList()
+        {
+            var context = Request.GetOwinContext().Get<ApplicationDbContext>();
+            if (context == null)
+                return StatusCode(HttpStatusCode.InternalServerError);
+            List<OrderCM> result = new List<OrderCM>();
+            foreach (Order order in context.Orders)
+            {
+                OrderCM clientModel = new OrderCM(order);
+                clientModel.Id = order.Id;
+                clientModel.Status = order.Status;
+                clientModel.Email = order.User.Email;
+                result.Add(clientModel);
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("Delete")]
+        [HostAuthentication(DefaultAuthenticationTypes.ApplicationCookie)]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IHttpActionResult> Delete(Dictionary<string, string> orderIdDict)
+        {
+            var orderId = orderIdDict["Id"];
+            var context = Request.GetOwinContext().Get<ApplicationDbContext>();
+            if (context == null)
+                return StatusCode(HttpStatusCode.InternalServerError);
+            Order orderToRemove = null;
+            foreach (Order order in context.Orders)
+            {
+                if (order.Id.Equals(orderId))
+                {
+                    orderToRemove = order;
+                    break;
+                }
+            }
+            if (orderToRemove == null)
+                return StatusCode(HttpStatusCode.BadRequest);
+            try
+            {
+                context.Orders.Remove(orderToRemove);
+                context.Entry(orderToRemove).State = System.Data.Entity.EntityState.Deleted;
+                await context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

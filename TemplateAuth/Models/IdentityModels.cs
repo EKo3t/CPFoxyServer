@@ -5,7 +5,9 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using Microsoft.AspNet.Identity.Owin;
+using TemplateAuth.Models.Vehicle;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TemplateAuth.Models
 {
@@ -29,8 +31,6 @@ namespace TemplateAuth.Models
             // Add custom user claims here
             return userIdentity;
         }
-
-
     }
 
     public class ApplicationRole : IdentityRole<string, ApplicationUserRole>
@@ -54,7 +54,7 @@ namespace TemplateAuth.Models
         public ApplicationDbContext()
             : base("DefaultConnection")
         {
-            Database.Initialize(force: true);        
+            Database.Initialize(force: true);
         }
 
         static ApplicationDbContext()
@@ -70,6 +70,11 @@ namespace TemplateAuth.Models
         public DbSet<UserInfo> UserInfoes { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Status> Statuses { get; set; }
+        public DbSet<Driver> Drivers { get; set; }
+        public DbSet<Car> Cars { get; set; }
+        public DbSet<CarModel> CarModels { get; set; }
+        public DbSet<CarMark> CarMarks { get; set; }
+        public DbSet<UserToInfo> UserToInfoes { get; set; }
     }
 
     public class ApplicationUserStore : UserStore<ApplicationUser, ApplicationRole, string, ApplicationUserLogin, ApplicationUserRole,

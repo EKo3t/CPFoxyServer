@@ -77,20 +77,22 @@ namespace TemplateAuth.Controllers
             {
                 ApplicationUser userByEmail = null;
                 var context = Request.GetOwinContext().Get<ApplicationDbContext>();
-                foreach (ApplicationUser loopUser in context.Users.ToList())
+                try
                 {
-                    if (loopUser.Email.Equals(email["email"]))
-                    {
-                        userByEmail = loopUser;
-                        break;
-                    }
+                    string userEmail = email["email"];
+                    userByEmail = context.Users.FirstOrDefault(u => u.Email.Equals(userEmail));
+                    if (userByEmail == null)
+                        return StatusCode(HttpStatusCode.NoContent);
+                    var result = context.UserToInfoes.FirstOrDefault(u => u.UserId.Equals(userByEmail.Id)).UserInfo;
+                    UserInfoCM userInfo = new UserInfoCM(result);
+                    userInfo.Email = email["email"];
+                    return Ok(userInfo);
                 }
-                if (userByEmail == null)
-                    return StatusCode(HttpStatusCode.NoContent);
-                var result = context.UserInfoes.First(u => u.UserId.Equals(userByEmail.Id));
-                UserInfoCM userInfo = new UserInfoCM(result);
-                userInfo.Email = email["email"];
-                return Ok(userInfo);
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.StackTrace);
+                    return StatusCode(HttpStatusCode.InternalServerError);
+                }
             }
             else
                 return StatusCode(HttpStatusCode.Forbidden);
@@ -107,35 +109,32 @@ namespace TemplateAuth.Controllers
                 ApplicationUser userByEmail = null;
                 var context = Request.GetOwinContext().Get<ApplicationDbContext>();
                 foreach (ApplicationUser loopUser in context.Users.ToList())
-                {
-                    if (loopUser.Email.Equals(userInfo.Email))
-                    {
-                        userByEmail = loopUser;
-                        break;
-                    }
-                }
-                if (userByEmail == null)
-                    return StatusCode(HttpStatusCode.NoContent);
                 try
                 {
-                    var result = context.UserInfoes.FirstOrDefault(u => u.UserId.Equals(userByEmail.Id));
+                    userByEmail = context.Users.FirstOrDefault(u => u.Email.Equals(userInfo.Email));
+                    if (userByEmail == null)
+                        return StatusCode(HttpStatusCode.NoContent);
+                    var result = context.UserToInfoes.FirstOrDefault(u => u.UserId.Equals(userByEmail.Id));
                     if (result != null)
                     {
-                        result.FirstName = userInfo.FirstName;
-                        result.LastName = userInfo.LastName;
-                        result.MiddleName = userInfo.MiddleName;
-                        result.BirthDate = userInfo.BirthDate;
+                        result.UserInfo.FirstName = userInfo.FirstName;
+                        result.UserInfo.LastName = userInfo.LastName;
+                        result.UserInfo.MiddleName = userInfo.MiddleName;
+                        result.UserInfo.BirthDate = userInfo.BirthDate;
                         context.Entry(result).State = System.Data.Entity.EntityState.Modified;
-                    } else
+                    } 
+                    else
                     {
-                        result = context.UserInfoes.Create();
-                        result.FirstName = userInfo.FirstName;
-                        result.LastName = userInfo.LastName;
-                        result.MiddleName = userInfo.MiddleName;
-                        result.BirthDate = userInfo.BirthDate;
-                        result.UserId = userByEmail.Id;
+                        result = context.UserToInfoes.Create();
+                        UserInfo usrInfo = context.UserInfoes.Create();
+                        usrInfo.FirstName = userInfo.FirstName;
+                        usrInfo.LastName = userInfo.LastName;
+                        usrInfo.MiddleName = userInfo.MiddleName;
+                        usrInfo.BirthDate = userInfo.BirthDate;
                         result.User = userByEmail;
-                        context.UserInfoes.Add(result);
+                        result.UserInfo = usrInfo;
+                        context.UserToInfoes.Add(result);
+                        context.UserInfoes.Add(usrInfo);
                     }
                     await context.SaveChangesAsync();
                 }
@@ -447,6 +446,30 @@ namespace TemplateAuth.Controllers
                 return GetErrorResult(result);
             }
 
+            try
+            {
+                var userInfo = new UserInfo();
+                userInfo.FirstName = model.FirstName;
+                userInfo.LastName = model.LastName;
+                userInfo.MiddleName = model.MiddleName;
+                userInfo.BirthDate = model.BirthDate;
+
+                await UserManager.AddToRoleAsync(user.Id, "User");
+                UserToInfo userToInfo = new UserToInfo();
+                userToInfo.UserInfo = userInfo;
+                userToInfo.User = user;
+
+                var context = Request.GetOwinContext().Get<ApplicationDbContext>();
+                context.UserInfoes.Add(userInfo);
+                context.Entry(userInfo).State = System.Data.Entity.EntityState.Added;
+                context.UserToInfoes.Add(userToInfo);
+                context.Entry(userToInfo).State = System.Data.Entity.EntityState.Added;
+                context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
             return Ok();
         }
 
