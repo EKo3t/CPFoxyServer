@@ -32,6 +32,7 @@ namespace TemplateAuth.Controllers
             order.orderTime = model.OrderTime;
             order.StartAddress = model.StartAddress;
             order.EndAddress = model.EndAddress;
+            order.Service = context.Services.FirstOrDefault(u => u.Id.ToString().Equals(model.ServiceId));
             order.UserId = user.Id;
             order.User = user;
             Status status = context.Statuses.FirstOrDefault(u => u.Name.Equals("Created"));
@@ -70,6 +71,8 @@ namespace TemplateAuth.Controllers
                     clientModel.Id = order.Id;
                     clientModel.Status = order.Status;
                     clientModel.Email = order.User.Email;
+                    clientModel.ServiceId = order.ServiceId.ToString();
+                    clientModel.Service = order.Service;
                     orders.Add(clientModel);
                 }
             }
@@ -92,6 +95,8 @@ namespace TemplateAuth.Controllers
                 clientModel.Id = order.Id;
                 clientModel.Status = order.Status;
                 clientModel.Email = order.User.Email;
+                clientModel.ServiceId = order.ServiceId.ToString();
+                clientModel.Service = order.Service;
                 result.Add(clientModel);
             }
             return Ok(result);

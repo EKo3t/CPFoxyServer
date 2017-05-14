@@ -29,6 +29,10 @@ namespace TemplateAuth.ClientModels
 
         public string EndAddress { get; set; }
 
+        public Service Service { get; set; }
+
+        public string ServiceId { get; set; }
+
         public string Email { get; set; }
 
         public Status Status { get; set; }

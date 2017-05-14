@@ -75,6 +75,7 @@ namespace TemplateAuth.Models
         public DbSet<CarModel> CarModels { get; set; }
         public DbSet<CarMark> CarMarks { get; set; }
         public DbSet<UserToInfo> UserToInfoes { get; set; }
+        public DbSet<Service> Services { get; set; }
     }
 
     public class ApplicationUserStore : UserStore<ApplicationUser, ApplicationRole, string, ApplicationUserLogin, ApplicationUserRole,

@@ -25,7 +25,11 @@ namespace TemplateAuth.Models
         [ForeignKey("User")]
         public string UserId { get; set; }
 
+        [ForeignKey("Service")]
+        public Guid ServiceId { get; set; }
+
         public virtual Status Status { get; set; }
         public virtual ApplicationUser User { get; set; }
+        public virtual Service Service { get; set; }
     }
 }

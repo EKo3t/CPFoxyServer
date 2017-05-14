@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Identity.Owin;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace TemplateAuth.Controllers
         [HttpPost]
         [Route("Create")]
         [Authorize(Roles = "Admin, Manager")]
+        [HostAuthentication(DefaultAuthenticationTypes.ApplicationCookie)]
         public async Task<IHttpActionResult> CreateDriver(Dictionary<string, string> param)
         {
             try
@@ -35,6 +37,7 @@ namespace TemplateAuth.Controllers
                 var car = context.Cars.FirstOrDefault(u => u.Id.Equals(id));
                 driver.Car = car;
                 context.Drivers.Add(driver);
+                driver.Id = Guid.NewGuid();
                 await context.SaveChangesAsync();
                 return Ok();
             }
@@ -48,6 +51,7 @@ namespace TemplateAuth.Controllers
         [HttpGet]
         [Route("List")]
         [Authorize(Roles = "Admin, Manager")]
+        [HostAuthentication(DefaultAuthenticationTypes.ApplicationCookie)]
         public async Task<IHttpActionResult> ReturnList()
         {
             try
