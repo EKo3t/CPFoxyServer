@@ -7,12 +7,8 @@ namespace TemplateAuth.ClientModels
 {
     public class DriverCM
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string MiddleName { get; set; }
+        public UserInfoCM UserDetails { get; set; }
 
-        public string CarMark { get; set; }
-        public string CarModel { get; set; }
-        public string Color { get; set; }
+        public CarCM Car { get; set; }
     }
 }

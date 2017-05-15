@@ -20,7 +20,11 @@ namespace TemplateAuth.Models
         [ForeignKey("Car")]
         public Guid CarId { get; set; }
 
+        [ForeignKey("Order")]
+        public Guid? OrderId { get; set; }
+
         public virtual ApplicationUser User { get; set; }
         public virtual Car Car { get; set; }
+        public virtual Order Order { get; set; }
     }
 }

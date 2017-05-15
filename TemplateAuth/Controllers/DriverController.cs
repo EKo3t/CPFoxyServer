@@ -26,7 +26,7 @@ namespace TemplateAuth.Controllers
             try
             {
                 string email = param["email"];
-                int id = JsonConvert.DeserializeObject<int>(param["car"]);
+                Guid id = Guid.Parse(param["car"]);
                 if (email == null)
                     return StatusCode(HttpStatusCode.BadRequest);
                 var context = Request.GetOwinContext().Get<ApplicationDbContext>();
@@ -36,8 +36,10 @@ namespace TemplateAuth.Controllers
                 Driver driver = context.Drivers.Create();
                 var car = context.Cars.FirstOrDefault(u => u.Id.Equals(id));
                 driver.Car = car;
-                context.Drivers.Add(driver);
                 driver.Id = Guid.NewGuid();
+                driver.User = user;
+                context.Drivers.Add(driver);
+                context.Entry(driver).State = System.Data.Entity.EntityState.Added;
                 await context.SaveChangesAsync();
                 return Ok();
             }
@@ -58,24 +60,64 @@ namespace TemplateAuth.Controllers
             {
                 var context = Request.GetOwinContext().Get<ApplicationDbContext>();
                 var drivers = context.Drivers.ToList();
+                var result = new List<DriverCM>();
                 foreach (Driver driver in drivers)
                 {
                     DriverCM driverCM = new DriverCM();
                     var userToInfo = context.UserToInfoes.FirstOrDefault(u => u.UserId.Equals(driver.UserId));
                     var userInfo = userToInfo == null ? null : userToInfo.UserInfo ;
-                    driverCM.FirstName = userInfo == null ? null : userInfo.FirstName;
-                    driverCM.LastName = userInfo == null ? null : userInfo.LastName;
-                    driverCM.MiddleName = userInfo == null ? null : userInfo.MiddleName;
+                    driverCM.UserDetails = new UserInfoCM(userInfo);
                     var car = context.Cars.FirstOrDefault();
-                    driverCM.CarMark = car.CarModel.CarMark.Mark;
-                    driverCM.CarModel = car.CarModel.Name;
-                    driverCM.Color = car.Color;
+                    CarCM carCM = new CarCM();
+                    carCM.Id = car.Id;
+                    carCM.CarMark = car.CarModel.CarMark.Mark;
+                    carCM.CarModel = car.CarModel.Name;
+                    carCM.CarColor = car.Color;
+                    driverCM.Car = carCM;
+                    result.Add(driverCM);
                 }
-                return Ok(drivers);
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 return StatusCode(HttpStatusCode.BadRequest);
+            }
+        }
+
+        [HttpPost]
+        [Route("Busy")]
+        [Authorize(Roles = "Admin, Manager")]
+        public async Task<IHttpActionResult> HireFirst(Dictionary<string, string> orderIdDict)
+        {
+            try
+            {
+                Guid orderId = Guid.Parse(orderIdDict["orderId"]);
+                var context = Request.GetOwinContext().Get<ApplicationDbContext>();
+                var freeDriver = context.Drivers.FirstOrDefault(u => u.Order == null);
+                if (freeDriver == null)
+                {
+                    HttpResponseMessage responseMsg = new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                    responseMsg.ReasonPhrase = "Нет свободных водителей";
+                    return ResponseMessage(responseMsg);
+                }
+                var order = context.Orders.FirstOrDefault(u => u.Id.Equals(orderId));
+                freeDriver.Order = order;
+                DriverCM driverCM = new DriverCM();
+                var userToInfo = context.UserToInfoes.FirstOrDefault(u => u.UserId.Equals(freeDriver.UserId));
+                var userInfo = userToInfo == null ? null : userToInfo.UserInfo;
+                driverCM.UserDetails = new UserInfoCM(userInfo);
+                driverCM.Car = new CarCM();
+                driverCM.Car.CarMark = freeDriver.Car.CarModel.CarMark.Mark;
+                driverCM.Car.CarModel = freeDriver.Car.CarModel.Name;
+                driverCM.Car.CarColor = freeDriver.Car.Color;
+                context.Entry(freeDriver).State = System.Data.Entity.EntityState.Modified;
+                await context.SaveChangesAsync();
+                return Ok(driverCM);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
     }

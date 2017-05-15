@@ -34,6 +34,7 @@ namespace TemplateAuth.Controllers
             order.EndAddress = model.EndAddress;
             order.Service = context.Services.FirstOrDefault(u => u.Id.ToString().Equals(model.ServiceId));
             order.UserId = user.Id;
+            order.Id = Guid.NewGuid();
             order.User = user;
             Status status = context.Statuses.FirstOrDefault(u => u.Name.Equals("Created"));
             order.Status = status;
@@ -43,13 +44,13 @@ namespace TemplateAuth.Controllers
                 context.Orders.Add(order);
                 context.Entry(order).State = System.Data.Entity.EntityState.Added;
                 await context.SaveChangesAsync();
+                return Ok(order.Id);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
-            return Ok();
         }
 
         [HttpGet]

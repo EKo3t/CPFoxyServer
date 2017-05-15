@@ -277,6 +277,14 @@
     <Compile Include="Migrations\201705141851466_Services.Designer.cs">
       <DependentUpon>201705141851466_Services.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705150021360_DriverOrder.cs" />
+    <Compile Include="Migrations\201705150021360_DriverOrder.Designer.cs">
+      <DependentUpon>201705150021360_DriverOrder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705150251523_IdOrderNoGenerate.cs" />
+    <Compile Include="Migrations\201705150251523_IdOrderNoGenerate.Designer.cs">
+      <DependentUpon>201705150251523_IdOrderNoGenerate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -396,6 +404,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705141851466_Services.resx">
       <DependentUpon>201705141851466_Services.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705150021360_DriverOrder.resx">
+      <DependentUpon>201705150021360_DriverOrder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705150251523_IdOrderNoGenerate.resx">
+      <DependentUpon>201705150251523_IdOrderNoGenerate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
